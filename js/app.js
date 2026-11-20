@@ -1,4 +1,3 @@
-
 // =====================================
 // CAREERCONNECT - JAVASCRIPT
 // =====================================
@@ -14,14 +13,22 @@ const CACHE_DURATION = 60 * 60 * 1000; // One hour
 const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchButton");
 const locationFilter = document.getElementById("locationFilter");
-const typeFilter = document.getElementById("typeFilter");
+const categoryFilter = document.getElementById("categoryFilter");
 const sortFilter = document.getElementById("sortFilter");
 const jobList = document.getElementById("jobList");
 const savedJobsList = document.getElementById("savedJobsList");
 
-
 // Store the jobs retrieved from the API
 let allJobs = [];
+
+// Read saved jobs safely from the browser
+function getSavedJobs() {
+    try {
+        return JSON.parse(localStorage.getItem("savedJobs")) || [];
+    } catch {
+        return [];
+    }
+}
 
 // 3. Load jobs from the API
 
@@ -42,6 +49,7 @@ async function loadJobs() {
 
             if (cacheIsValid) {
                 allJobs = cached.jobs;
+                fillCategoryFilter();
                 displayJobs();
                 return;
             }
@@ -71,6 +79,7 @@ async function loadJobs() {
             })
         );
 
+        fillCategoryFilter();
         displayJobs();
 
     } catch (error) {
@@ -85,6 +94,7 @@ async function loadJobs() {
 
                 if (Array.isArray(cached.jobs) && cached.jobs.length > 0) {
                     allJobs = cached.jobs;
+                    fillCategoryFilter();
                     displayJobs();
                     return;
                 }
@@ -93,19 +103,40 @@ async function loadJobs() {
             console.error("Cache error:", cacheError);
         }
 
+        document.getElementById("jobCount").textContent = "";
         jobList.textContent =
             "Sorry, we could not load job opportunities. Please try again later.";
     }
 }
 
-// 4. Display job opportunities
+// 4. Fill the category filter with the categories found in the jobs
+
+function fillCategoryFilter() {
+    const categories = [...new Set(
+        allJobs
+            .map((job) => (job.category || "").trim())
+            .filter((category) => category !== "")
+    )].sort();
+
+    // Keep the "All Categories" option and remove the rest
+    categoryFilter.length = 1;
+
+    categories.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+}
+
+// 5. Display job opportunities
 
 function displayJobs() {
     jobList.replaceChildren();
 
     const searchTerm = searchInput.value.trim().toLowerCase();
     const selectedLocation = locationFilter.value;
-    const selectedType = typeFilter.value;
+    const selectedCategory = categoryFilter.value;
     const selectedSort = sortFilter.value;
 
     // Search and filter the jobs
@@ -132,18 +163,11 @@ function displayJobs() {
                 !isRwanda &&
                 !isRemote);
 
-        const jobType = (
-            job.job_type ||
-            job.type ||
-            job.employment_type ||
-            ""
-        ).toLowerCase();
+        const matchesCategory =
+            selectedCategory === "all" ||
+            (job.category || "") === selectedCategory;
 
-        const matchesType =
-            selectedType === "all" ||
-            jobType.includes(selectedType.toLowerCase());
-
-        return matchesSearch && matchesLocation && matchesType;
+        return matchesSearch && matchesLocation && matchesCategory;
     });
 
     // Sort the results
@@ -158,8 +182,8 @@ function displayJobs() {
     }
 
     document.getElementById("jobCount").textContent =
-    `${filteredJobs.length} job opportunities found`;
-    
+        `${filteredJobs.length} job opportunities found`;
+
     // Show a message if no jobs match
     if (filteredJobs.length === 0) {
         jobList.textContent =
@@ -179,8 +203,13 @@ function displayJobs() {
         company.className = "job-company";
         company.textContent = job.company || "Company not provided";
 
+        const category = document.createElement("p");
+        category.textContent = "Category: " + (job.category || "Not specified");
+
         const location = document.createElement("p");
-        location.textContent = "Location: " + (job.location || "Not specified");
+        location.textContent =
+            "Location: " + (job.location || "Not specified") +
+            (job.remote === true ? " (Remote)" : "");
 
         const salary = document.createElement("p");
         salary.textContent = "Salary: " + (job.salary || "Not specified");
@@ -190,42 +219,6 @@ function displayJobs() {
 
         const source = document.createElement("a");
         source.textContent = "View original job listing";
-
-
-// Create a Save Job button
-const saveButton = document.createElement("button");
-saveButton.textContent = "Save Job";
-saveButton.className = "save-button";
-
-// Check whether this job is already saved
-let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-
-if (savedJobs.some((savedJob) => savedJob.url === job.url)) {
-    saveButton.textContent = "Saved";
-}
-
-// Save or remove the job when the button is clicked
-saveButton.addEventListener("click", () => {
-    let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-
-    const alreadySaved = savedJobs.some(
-        (savedJob) => savedJob.url === job.url
-    );
-
-    if (alreadySaved) {
-        savedJobs = savedJobs.filter(
-            (savedJob) => savedJob.url !== job.url
-        );
-        saveButton.textContent = "Save Job";
-    } else {
-        savedJobs.push(job);
-        saveButton.textContent = "Saved";
-    }
-
-    localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
-    displaySavedJobs();
-});
-
 
         // Only allow secure HTTPS links
         try {
@@ -242,21 +235,54 @@ saveButton.addEventListener("click", () => {
             source.textContent = "Application link unavailable";
         }
 
+        // Create a Save Job button
+        const saveButton = document.createElement("button");
+        saveButton.textContent = "Save Job";
+        saveButton.className = "save-button";
+
+        // Check whether this job is already saved
+        if (getSavedJobs().some((savedJob) => savedJob.url === job.url)) {
+            saveButton.textContent = "Saved";
+        }
+
+        // Save or remove the job when the button is clicked
+        saveButton.addEventListener("click", () => {
+            let savedJobs = getSavedJobs();
+
+            const alreadySaved = savedJobs.some(
+                (savedJob) => savedJob.url === job.url
+            );
+
+            if (alreadySaved) {
+                savedJobs = savedJobs.filter(
+                    (savedJob) => savedJob.url !== job.url
+                );
+                saveButton.textContent = "Save Job";
+            } else {
+                savedJobs.push(job);
+                saveButton.textContent = "Saved";
+            }
+
+            localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
+            displaySavedJobs();
+        });
+
         card.append(
-          title,
-          company,
-          location,
-          salary,
-          posted,
-          source,
-          saveButton
-      );
+            title,
+            company,
+            category,
+            location,
+            salary,
+            posted,
+            source,
+            saveButton
+        );
 
         jobList.appendChild(card);
     });
 }
 
-// 5. Connect search and filters
+// 6. Connect search and filters
 
 searchButton.addEventListener("click", displayJobs);
 
@@ -264,16 +290,16 @@ searchInput.addEventListener("input", displayJobs);
 
 locationFilter.addEventListener("change", displayJobs);
 
-typeFilter.addEventListener("change", displayJobs);
+categoryFilter.addEventListener("change", displayJobs);
 
 sortFilter.addEventListener("change", displayJobs);
 
+// 7. Display saved jobs
 
-// Display saved jobs
 function displaySavedJobs() {
     savedJobsList.replaceChildren();
 
-    const savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
+    const savedJobs = getSavedJobs();
 
     if (savedJobs.length === 0) {
         savedJobsList.textContent = "You haven't saved any jobs yet.";
@@ -313,8 +339,7 @@ function displaySavedJobs() {
     });
 }
 
-
-// 6. Start the application
+// 8. Start the application
 
 loadJobs();
 displaySavedJobs();
