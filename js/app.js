@@ -223,6 +223,7 @@ saveButton.addEventListener("click", () => {
     }
 
     localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
+    displaySavedJobs();
 });
 
 
