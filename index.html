@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CareerConnect helps students and job seekers discover jobs and internships in Rwanda and around the world.">
+    <title>CareerConnect | Find Your Next Opportunity</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">Career<span>Connect</span></a>
+
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#jobs">Find Jobs</a></li>
+                <li><a href="#categories">Categories</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#saved-jobs">Saved Jobs</a></li>
+            </ul>
+
+            <a href="#jobs" class="nav-button">Explore Jobs</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <p class="hero-tag">YOUR FUTURE STARTS HERE</p>
+
+                <h1>Find the opportunity
+                    <span>you deserve.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Discover jobs and internships in Rwanda and
+                    across the world. Your next career opportunity
+                    starts with one search.
+                </p>
+
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Job title, company or keyword..."
+                    >
+
+                    <button id="searchButton">Search Jobs</button>
+                </div>
+
+                <p class="search-note">
+                    Explore opportunities for students, graduates
+                    and professionals.
+                </p>
+            </div>
+        </section>
+
+        <!-- Job Categories -->
+        <section class="categories" id="categories">
+            <div class="section-heading">
+                <p>EXPLORE OPPORTUNITIES</p>
+                <h2>Popular Job Categories</h2>
+            </div>
+
+            <div class="category-container">
+
+                <div class="category-card">
+                    <h3>Technology</h3>
+                    <p>IT, Software and Data</p>
+                </div>
+
+                <div class="category-card">
+                    <h3>Business</h3>
+                    <p>Management and Operations</p>
+                </div>
+
+                <div class="category-card">
+                    <h3>Finance</h3>
+                    <p>Accounting and Banking</p>
+                </div>
+
+                <div class="category-card">
+                    <h3>Marketing</h3>
+                    <p>Digital and Communications</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Job Listings -->
+        <section class="jobs-section" id="jobs">
+
+            <div class="section-heading">
+                <p>FIND YOUR NEXT OPPORTUNITY</p>
+                <h2>Latest Job Opportunities</h2>
+            </div>
+
+            <div class="job-controls">
+
+                <select id="locationFilter">
+                    <option value="all">All Locations</option>
+                    <option value="rwanda">Rwanda</option>
+                    <option value="remote">Remote</option>
+                    <option value="international">International</option>
+                </select>
+
+                <select id="typeFilter">
+                    <option value="all">All Job Types</option>
+                    <option value="internship">Internship</option>
+                    <option value="full-time">Full-time</option>
+                    <option value="part-time">Part-time</option>
+                    <option value="contract">Contract</option>
+                </select>
+
+                <select id="sortFilter">
+                    <option value="newest">Newest First</option>
+                    <option value="company">Company Name</option>
+                </select>
+
+            </div>
+
+            <p id="jobCount">Loading opportunities...</p>
+            <div id="jobList" class="job-list">
+                
+                <p class="loading-message">Job opportunities will appear here.</p>
+            </div>
+
+        </section>
+
+
+<!-- SAVED JOBS SECTION -->
+<section id="saved-jobs" class="jobs-section">
+    <div class="section-heading">
+        <h2>My Saved Jobs</h2>
+        <p>Keep track of the opportunities you're interested in.</p>
+    </div>
+
+    <div id="savedJobsList" class="job-list">
+        <p>You haven't saved any jobs yet.</p>
+    </div>
+</section>
+
+
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <div>
+                <p>ABOUT CAREERCONNECT</p>
+                <h2>Connecting talent with opportunities.</h2>
+                <p>
+                    CareerConnect makes it easier for students,
+                    graduates and professionals to discover
+                    employment opportunities and internships
+                    in Rwanda and internationally.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 CareerConnect. All rights reserved.</p>
+        <p>Connecting talent with opportunities.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
